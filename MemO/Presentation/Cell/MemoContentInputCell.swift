@@ -46,8 +46,10 @@ extension MemoContentInputCell: UITextViewDelegate {
     // textView의 placeholder
     func textViewDidBeginEditing(_ textView: UITextView) {
         if textView.textColor == .placeholderText {
-            textView.text = ""
-            textView.textColor = .label
+            DispatchQueue.main.async { // textView에 붙여넣기할 때, 에러 처리
+                textView.text = ""
+                textView.textColor = .label
+            }
         }
     }
     // textView의 placeholder

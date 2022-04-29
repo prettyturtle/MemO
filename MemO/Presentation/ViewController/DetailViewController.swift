@@ -10,6 +10,12 @@ import SnapKit
 
 class DetailViewController: UIViewController {
     // MARK: - UI Components
+    private lazy var scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.alwaysBounceVertical = true
+        return scrollView
+    }()
+    private lazy var scrollContentView = UIView()
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = memo.title
@@ -115,18 +121,28 @@ private extension DetailViewController {
         view.backgroundColor = .systemBackground
     }
     func layout() {
+        view.addSubview(scrollView)
+        scrollView.snp.makeConstraints {
+            $0.edges.equalTo(view.safeAreaLayoutGuide)
+        }
+        scrollView.addSubview(scrollContentView)
+        scrollContentView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+            $0.width.equalToSuperview()
+        }
+        
         [
             titleLabel,
             contentLabel,
             dateLabel
-        ].forEach { view.addSubview($0) }
+        ].forEach { scrollContentView.addSubview($0) }
         
         let commonSpacing: CGFloat = 16.0
         
         titleLabel.snp.makeConstraints {
-            $0.leading.equalTo(view.safeAreaLayoutGuide).inset(commonSpacing)
-            $0.top.equalTo(view.safeAreaLayoutGuide).inset(commonSpacing)
-            $0.trailing.equalTo(view.safeAreaLayoutGuide).inset(commonSpacing)
+            $0.leading.equalToSuperview().inset(commonSpacing)
+            $0.top.equalToSuperview().inset(commonSpacing)
+            $0.trailing.equalToSuperview().inset(commonSpacing)
         }
         contentLabel.snp.makeConstraints {
             $0.leading.equalTo(titleLabel.snp.leading)
@@ -136,6 +152,7 @@ private extension DetailViewController {
         dateLabel.snp.makeConstraints {
             $0.leading.equalTo(titleLabel.snp.leading)
             $0.top.equalTo(contentLabel.snp.bottom).offset(commonSpacing)
+            $0.bottom.equalToSuperview()
         }
     }
 }
