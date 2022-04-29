@@ -48,7 +48,6 @@ class WriteViewController: UIViewController {
         setupNavigationBar()
         attribute()
         layout()
-        print(writeType)
     }
 }
 
@@ -288,7 +287,7 @@ private extension WriteViewController {
 // MARK: - UI Methods
 private extension WriteViewController {
     func setupNavigationBar() {
-        navigationItem.title = "메모 작성"
+        navigationItem.title = writeType == .new ? "메모 작성" : "메모 수정"
         let dismissBarButtonItem = UIBarButtonItem(
             image: UIImage(systemName: "xmark"),
             style: .plain,
