@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6B0CF9D0281BFE370067AE9B /* WriteType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B0CF9CF281BFE370067AE9B /* WriteType.swift */; };
+		6B0CF9D3281C07D70067AE9B /* DetailViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B0CF9D2281C07D70067AE9B /* DetailViewControllerDelegate.swift */; };
 		6BD9888C281A574A004A0C1D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD9888B281A574A004A0C1D /* AppDelegate.swift */; };
 		6BD9888E281A574A004A0C1D /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD9888D281A574A004A0C1D /* SceneDelegate.swift */; };
 		6BD98890281A574A004A0C1D /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD9888F281A574A004A0C1D /* MainViewController.swift */; };
@@ -29,6 +31,8 @@
 
 /* Begin PBXFileReference section */
 		6B0CF9CE281B0DE50067AE9B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		6B0CF9CF281BFE370067AE9B /* WriteType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteType.swift; sourceTree = "<group>"; };
+		6B0CF9D2281C07D70067AE9B /* DetailViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewControllerDelegate.swift; sourceTree = "<group>"; };
 		6BD98888281A574A004A0C1D /* MemO.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MemO.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6BD9888B281A574A004A0C1D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6BD9888D281A574A004A0C1D /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -62,6 +66,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6B0CF9D1281BFE4B0067AE9B /* Enum */ = {
+			isa = PBXGroup;
+			children = (
+				6B0CF9CF281BFE370067AE9B /* WriteType.swift */,
+			);
+			path = Enum;
+			sourceTree = "<group>";
+		};
 		6BD9887F281A574A004A0C1D = {
 			isa = PBXGroup;
 			children = (
@@ -84,6 +96,7 @@
 			children = (
 				6BD9888B281A574A004A0C1D /* AppDelegate.swift */,
 				6BD9888D281A574A004A0C1D /* SceneDelegate.swift */,
+				6B0CF9D1281BFE4B0067AE9B /* Enum */,
 				6BD988BA281ABF3E004A0C1D /* Protocol */,
 				6BD988B7281A9FA6004A0C1D /* Manager */,
 				6BD988B4281A9616004A0C1D /* Model */,
@@ -156,6 +169,7 @@
 			isa = PBXGroup;
 			children = (
 				6BD988B8281ABEE6004A0C1D /* WriteViewControllerDelegate.swift */,
+				6B0CF9D2281C07D70067AE9B /* DetailViewControllerDelegate.swift */,
 			);
 			path = Protocol;
 			sourceTree = "<group>";
@@ -243,8 +257,10 @@
 				6BD988B9281ABEE6004A0C1D /* WriteViewControllerDelegate.swift in Sources */,
 				6BD9888E281A574A004A0C1D /* SceneDelegate.swift in Sources */,
 				6BD988AB281A873B004A0C1D /* MemoTitleInputCell.swift in Sources */,
+				6B0CF9D0281BFE370067AE9B /* WriteType.swift in Sources */,
 				6BD988A7281A8404004A0C1D /* SecretToggleCell.swift in Sources */,
 				6BD988A5281A7D7C004A0C1D /* WriteViewController.swift in Sources */,
+				6B0CF9D3281C07D70067AE9B /* DetailViewControllerDelegate.swift in Sources */,
 				6BD988BE281ACA89004A0C1D /* UITextView+.swift in Sources */,
 				6BD988A3281A7857004A0C1D /* MemoListTableViewCell.swift in Sources */,
 				6BD988B6281A9FA2004A0C1D /* UserDefaultsManager.swift in Sources */,

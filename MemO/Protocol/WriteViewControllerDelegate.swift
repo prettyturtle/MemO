@@ -9,4 +9,5 @@ import Foundation
 
 protocol WriteViewControllerDelegate: AnyObject {
     func uploadSuccessThenRefresh()
+    func modifySuccessThenRefresh(newMemo: Memo)
 }

@@ -74,4 +74,24 @@ struct UserDefaultsManager {
     func removeAll() {
         standard.removeObject(forKey: key)
     }
+    
+    /// 메모를 수정하는 메서드
+    ///
+    /// 기존의 메모를 삭제하고 새로운 메모를 등록한다
+    func updateMemo(
+        previousMemo: Memo,
+        newMemo: Memo,
+        completionHandler: @escaping (Result<Void, Error>) -> Void
+    ) {
+        removeMemo(memo: previousMemo) {
+            createMemo(newMemo: newMemo) { result in
+                switch result {
+                case .success(_):
+                    completionHandler(.success(()))
+                case .failure(let error):
+                    completionHandler(.failure(error))
+                }
+            }
+        }
+    }
 }

@@ -16,11 +16,11 @@ struct Memo: Codable, Equatable {
     let title: String
     let content: String
     var password: String?
-    var createdDate: Date { Date.now }
+    var createdDate: Date
     
     var date: String {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "y.M.d(E)"
+        dateFormatter.dateFormat = "y.M.d(E) h:m:s"
         dateFormatter.locale = Locale(identifier: "ko_KR")
         return dateFormatter.string(from: createdDate)
     }

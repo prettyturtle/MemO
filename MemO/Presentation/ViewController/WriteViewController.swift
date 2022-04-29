@@ -26,9 +26,21 @@ class WriteViewController: UIViewController {
     
     // MARK: - Properties
     private let userDefaultsManager = UserDefaultsManager()
+    let writeType: WriteType
+    let willModifyMemo: Memo?
     
     // MARK: - Delegate
     weak var delegate: WriteViewControllerDelegate?
+    
+    // MARK: - init
+    init(writeType: WriteType, memo: Memo? = nil) {
+        self.writeType = writeType
+        self.willModifyMemo = memo
+        super.init(nibName: nil, bundle: nil)
+    }
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - Life Cycle
     override func viewDidLoad() {
@@ -36,6 +48,7 @@ class WriteViewController: UIViewController {
         setupNavigationBar()
         attribute()
         layout()
+        print(writeType)
     }
 }
 
@@ -68,16 +81,28 @@ extension WriteViewController: UITableViewDataSource {
             let cell = SecretToggleCell()
             cell.setupView()
             cell.selectionStyle = .none
+            if writeType == .modify,
+               let willModifyMemo = willModifyMemo {
+                cell.setupModifyView(isSecret: willModifyMemo.isSecret) // 수정될 메모의 정보 보이기
+            }
             return cell
         case 1:
             let cell = MemoTitleInputCell()
             cell.setupView()
             cell.selectionStyle = .none
+            if writeType == .modify,
+               let willModifyMemo = willModifyMemo {
+                cell.setupModifyView(title: willModifyMemo.title) // 수정될 메모의 정보 보이기
+            }
             return cell
         case 2:
             let cell = MemoContentInputCell()
             cell.setupView()
             cell.selectionStyle = .none
+            if writeType == .modify,
+               let willModifyMemo = willModifyMemo {
+                cell.setupModifyView(content: willModifyMemo.content) // 수정될 메모의 정보 보이기
+            }
             return cell
         default:
             break
@@ -99,7 +124,8 @@ private extension WriteViewController {
             isSecret: newMemoInfo.isSecret,
             title: newMemoInfo.title,
             content: newMemoInfo.content,
-            password: nil
+            password: nil,
+            createdDate: Date.now
         )
         
         if newMemoInfo.isSecret { // 만약 비밀 메모인 경우, 암호를 설정하도록
@@ -110,16 +136,75 @@ private extension WriteViewController {
                     self?.uploadNewMemo(newMemo: newMemo)
                 }
             }
-        } else { // 비밀 메모가 아닌 경우, 바로 저장
+        } else { // 일반 메모인 경우, 바로 저장
             uploadNewMemo(newMemo: newMemo)
         }
     }
+    // 작성 완료 버튼을 눌렀을 때 호출되는 메서드 (수정 타입)
+    @objc func didTapModifyDoneBarButton() {
+        guard let newMemoInfo = getNewMemoInfo(),
+              let previousMemo = willModifyMemo else { return }
+        
+        var newMemo = Memo(
+            id: previousMemo.id, // id는 이전의 메모와 동일
+            isSecret: newMemoInfo.isSecret,
+            title: newMemoInfo.title,
+            content: newMemoInfo.content,
+            password: nil,
+            createdDate: previousMemo.createdDate // 등록 날짜는 이전의 메모와 동일
+        )
+        
+        if newMemoInfo.isSecret { // 만약 비밀 메모로 수정된 경우, 암호를 설정하도록
+            showPasswordInputAlert { [weak self] pw in
+                if let pw = pw,
+                   !pw.isEmpty {
+                    newMemo.password = pw
+                    self?.updateMemo(previousMemo: previousMemo, newMemo: newMemo)
+                }
+            }
+        } else { // 일반 메모로 수정되면 바로 수정
+            updateMemo(previousMemo: previousMemo, newMemo: newMemo)
+        }
+    }
+    
     @objc func didTapWriteTableView() {
         view.endEditing(true)
     }
 }
 // MARK: - Logics
 private extension WriteViewController {
+    // UserDefaultsManager의 updateMemo 메서드를 통해 메모를 수정한다
+    func updateMemo(previousMemo: Memo, newMemo: Memo) {
+        userDefaultsManager.updateMemo(previousMemo: previousMemo, newMemo: newMemo) { [weak self] result in
+            let alertController = UIAlertController(
+                title: nil,
+                message: nil,
+                preferredStyle: .alert
+            )
+            switch result {
+            case .success(_):
+                alertController.title = "작성 완료!"
+                let okAction = UIAlertAction(
+                    title: "확인",
+                    style: .default
+                ) { [weak self] _ in
+                    self?.delegate?.modifySuccessThenRefresh(newMemo: newMemo) // 수정 성공
+                    self?.dismiss(animated: true)
+                }
+                alertController.addAction(okAction)
+            case .failure(let error):
+                alertController.title = "작성 실패ㅠ"
+                alertController.message = error.localizedDescription
+                let okAction = UIAlertAction(
+                    title: "확인",
+                    style: .default
+                )
+                alertController.addAction(okAction)
+            }
+            self?.present(alertController, animated: true)
+        }
+    }
+    
     // UserDefaultsManager의 createMemo 메서드를 통해 메모를 저장한다
     func uploadNewMemo(newMemo: Memo) {
         userDefaultsManager.createMemo(newMemo: newMemo) { [weak self] result in
@@ -217,11 +302,20 @@ private extension WriteViewController {
         customView.backgroundColor = .mainColor
         customView.frame = CGRect(x: 0.0, y: 0.0, width: 56.0, height: 36.0)
         customView.layer.cornerRadius = 18.0
-        customView.addTarget(
-            self,
-            action: #selector(didTapWriteDoneBarButton),
-            for: .touchUpInside
-        )
+        switch writeType { // 새로운 메모인지, 수정하는 메모인지 다른 액션을 부여한다
+        case .new:
+            customView.addTarget(
+                self,
+                action: #selector(didTapWriteDoneBarButton),
+                for: .touchUpInside
+            )
+        case .modify:
+            customView.addTarget(
+                self,
+                action: #selector(didTapModifyDoneBarButton),
+                for: .touchUpInside
+            )
+        }
         let writeDoneBarButtonItem = UIBarButtonItem(customView: customView)
         
         dismissBarButtonItem.tintColor = .label

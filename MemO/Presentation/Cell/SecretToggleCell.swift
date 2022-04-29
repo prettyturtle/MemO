@@ -35,6 +35,10 @@ class SecretToggleCell: UITableViewCell {
     func setupView() {
         layout()
     }
+    func setupModifyView(isSecret: Bool) { // 수정 타입일 때, 수정할 메모 정보를 적용한다
+        secretToggle.isOn = isSecret
+        self.isSecret = isSecret
+    }
 }
 
 // MARK: - @objc Methods

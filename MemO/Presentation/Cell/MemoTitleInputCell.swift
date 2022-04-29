@@ -22,6 +22,9 @@ class MemoTitleInputCell: UITableViewCell {
     func setupView() {
         layout()
     }
+    func setupModifyView(title: String) { // 수정 타입일 때, 수정할 메모 정보를 적용한다
+        titleTextField.text = title
+    }
 }
 
 // MARK: - UI Methods

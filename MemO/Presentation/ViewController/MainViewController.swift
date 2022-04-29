@@ -163,6 +163,14 @@ extension MainViewController: WriteViewControllerDelegate {
     func uploadSuccessThenRefresh() {
         getMemoList()
     }
+    func modifySuccessThenRefresh(newMemo: Memo) {}
+}
+
+// MARK: - DetailViewControllerDelegate
+extension MainViewController: DetailViewControllerDelegate {
+    func willDisappearRefreshTableView() {
+        getMemoList()
+    }
 }
 
 // MARK: - @objc Methods
@@ -174,7 +182,7 @@ private extension MainViewController {
     }
     // 메모 작성 버튼을 눌렀을 때, 메모 작성 뷰를 present
     @objc func didTapWriteFloatyButton() {
-        let rootVC = WriteViewController()
+        let rootVC = WriteViewController(writeType: .new)
         rootVC.delegate = self
         let writeVC = UINavigationController(rootViewController: rootVC)
         writeVC.modalPresentationStyle = .fullScreen
@@ -261,6 +269,7 @@ private extension MainViewController {
     // 메모 상세 보기 뷰로 이동
     func moveToDetailViewController(memo: Memo) {
         let detailViewController = DetailViewController(memo: memo)
+        detailViewController.delegate = self
         navigationController?.pushViewController(detailViewController, animated: true)
     }
     // UserDefaults에 저장된 메모들을 가져온 후, 저장된 메모가 없다면 emptyImageView를 보여주고, 있다면 메모리스트를 보여준다

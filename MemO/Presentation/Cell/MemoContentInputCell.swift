@@ -34,6 +34,11 @@ class MemoContentInputCell: UITableViewCell {
     func setupView() {
         layout()
     }
+    func setupModifyView(content: String) { // 수정 타입일 때, 수정할 메모 정보를 적용한다
+        contentTextView.text = content
+        contentTextView.textColor = .label
+        contentCountLabel.text = "글자 수 \(contentTextView.text!.count)"
+    }
 }
 
 // MARK: - UITextViewDelegate
