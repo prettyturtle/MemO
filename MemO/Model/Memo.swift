@@ -12,7 +12,7 @@ struct Memo: Codable, Equatable, Hashable {
         lhs.id == rhs.id
     }
     var id: String = UUID().uuidString
-    let isSecret: Bool
+    var isSecret: Bool
     let title: String
     let content: String
     var password: String?

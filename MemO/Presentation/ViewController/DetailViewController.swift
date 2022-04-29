@@ -16,6 +16,23 @@ class DetailViewController: UIViewController {
         return scrollView
     }()
     private lazy var scrollContentView = UIView()
+    private lazy var secretTitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "비밀 메모"
+        label.font = .systemFont(ofSize: 16.0, weight: .semibold)
+        return label
+    }()
+    private lazy var secretToggle: UISwitch = {
+        let toggle = UISwitch()
+        toggle.onTintColor = .mainColor
+        toggle.isOn = memo.isSecret
+        toggle.addTarget(
+            self,
+            action: #selector(switchSecretToggle),
+            for: .valueChanged
+        )
+        return toggle
+    }()
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = memo.title
@@ -40,6 +57,7 @@ class DetailViewController: UIViewController {
     
     // MARK: - Properties
     var memo: Memo
+    private let userDefaultsManager = UserDefaultsManager()
     
     // MARK: - Delegate
     weak var delegate: DetailViewControllerDelegate?
@@ -89,6 +107,102 @@ private extension DetailViewController {
         modifyVC.modalPresentationStyle = .fullScreen
         present(modifyVC, animated: true)
     }
+    // secretToggle이 눌렸을 때
+    @objc func switchSecretToggle(_ sender: UISwitch) {
+        if sender.isOn { // 만약 비밀 메모로 변경하려면 암호 설정하는 얼럿을 띄운다
+            let alertController = UIAlertController(
+                title: "비밀번호 설정",
+                message: nil,
+                preferredStyle: .alert
+            )
+            alertController.addTextField {
+                $0.placeholder = "비밀번호 입력..."
+                $0.configureKeyboard()
+                $0.isSecureTextEntry = true
+            }
+            let okAction = UIAlertAction(
+                title: "확인",
+                style: .default
+            ) { [weak self] _ in
+                guard let self = self else { return }
+                let password = alertController.textFields?.first?.text
+                if password != nil {
+                    self.memo.isSecret = true // 현재 메모 상세 뷰의 메모 정보를 변경
+                    self.memo.password = password! // 현재 메모 상세 뷰의 메모 정보를 변경
+                    self.updateMemoIsSecret(memo: self.memo) { result in // 변경 사항을 저장
+                        switch result {
+                        case .success(_):
+                            self.setupNavigationBar()
+                        case .failure(_):
+                            break
+                        }
+                    }
+                }
+            }
+            let cancelAction = UIAlertAction(
+                title: "취소",
+                style: .cancel
+            ) { _ in sender.isOn = false } // 변경 사항 없음
+            [
+                okAction,
+                cancelAction
+            ].forEach { alertController.addAction($0) }
+            present(alertController, animated: true)
+        } else { // 만약 일반 메모로 변경하려면 얼럿을 띄운다
+            let alertController = UIAlertController(
+                title: "일반 메모로 변경 하시겠습니까?",
+                message: nil,
+                preferredStyle: .alert
+            )
+            let okAction = UIAlertAction(
+                title: "확인",
+                style: .default
+            ) { [weak self] _ in
+                guard let self = self else { return }
+                self.memo.isSecret = false // 일반 메모로 변경
+                self.memo.password = nil // 암호 제거
+                self.updateMemoIsSecret(memo: self.memo) { result in // 변경 사항을 저장
+                    switch result {
+                    case .success(_):
+                        self.setupNavigationBar()
+                    case .failure(_):
+                        break
+                    }
+                }
+            }
+            let cancelAction = UIAlertAction(
+                title: "취소",
+                style: .cancel
+            ) { _ in sender.isOn = true } // 변경 사항 없음
+            [
+                okAction,
+                cancelAction
+            ].forEach { alertController.addAction($0) }
+            present(alertController, animated: true)
+        }
+    }
+}
+
+// MARK: - Logics
+private extension DetailViewController {
+    // 메모의 isSecret의 변경사항을 수정하는 메서드, UserDefaultsManager의 updateMemo 메서드를 사용
+    func updateMemoIsSecret(
+        memo: Memo,
+        completionHandler: @escaping (Result<Void, Error>) -> Void
+    ) {
+        var previousMemo = memo
+        previousMemo.isSecret = !previousMemo.isSecret
+        userDefaultsManager.updateMemo(
+            previousMemo: previousMemo,
+            newMemo: memo) { result in
+                switch result {
+                case .success(_):
+                    completionHandler(.success(()))
+                case .failure(let error):
+                    completionHandler(.failure(error))
+                }
+            }
+    }
 }
 
 // MARK: - UI Methods
@@ -132,6 +246,8 @@ private extension DetailViewController {
         }
         
         [
+            secretTitleLabel,
+            secretToggle,
             titleLabel,
             contentLabel,
             dateLabel
@@ -139,9 +255,17 @@ private extension DetailViewController {
         
         let commonSpacing: CGFloat = 16.0
         
+        secretTitleLabel.snp.makeConstraints {
+            $0.leading.equalToSuperview().inset(commonSpacing)
+            $0.centerY.equalTo(secretToggle.snp.centerY)
+        }
+        secretToggle.snp.makeConstraints {
+            $0.top.equalToSuperview().inset(commonSpacing)
+            $0.trailing.equalToSuperview().inset(commonSpacing)
+        }
         titleLabel.snp.makeConstraints {
             $0.leading.equalToSuperview().inset(commonSpacing)
-            $0.top.equalToSuperview().inset(commonSpacing)
+            $0.top.equalTo(secretToggle.snp.bottom).offset(commonSpacing)
             $0.trailing.equalToSuperview().inset(commonSpacing)
         }
         contentLabel.snp.makeConstraints {
