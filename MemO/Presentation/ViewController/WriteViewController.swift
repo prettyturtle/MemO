@@ -190,7 +190,7 @@ private extension WriteViewController {
             )
             switch result {
             case .success(_):
-                alertController.title = "작성 완료!"
+                alertController.title = "수정 완료"
                 let okAction = UIAlertAction(
                     title: "확인",
                     style: .default
@@ -200,7 +200,7 @@ private extension WriteViewController {
                 }
                 alertController.addAction(okAction)
             case .failure(let error):
-                alertController.title = "작성 실패ㅠ"
+                alertController.title = "수정 실패"
                 alertController.message = error.localizedDescription
                 let okAction = UIAlertAction(
                     title: "확인",
@@ -222,7 +222,7 @@ private extension WriteViewController {
             )
             switch result {
             case .success(_):
-                alertController.title = "작성 완료!"
+                alertController.title = "작성 완료"
                 let okAction = UIAlertAction(
                     title: "확인",
                     style: .default
@@ -232,7 +232,7 @@ private extension WriteViewController {
                 }
                 alertController.addAction(okAction)
             case .failure(let error):
-                alertController.title = "작성 실패ㅠ"
+                alertController.title = "작성 실패"
                 alertController.message = error.localizedDescription
                 let okAction = UIAlertAction(
                     title: "확인",
