@@ -7,7 +7,11 @@
 
 import Foundation
 
-struct Memo: Codable {
+struct Memo: Codable, Equatable {
+    static func == (lhs: Memo, rhs: Memo) -> Bool {
+        lhs.id == rhs.id
+    }
+    var id: String = UUID().uuidString
     let isSecret: Bool
     let title: String
     let content: String

@@ -45,6 +45,31 @@ struct UserDefaultsManager {
             completionHandler([])
         }
     }
+        
+    /// 메모 삭제 메서드
+    ///
+    /// 현재 저장되어있는 메모 리스트를 받아와 메모를 삭제한 후, 메모 리스트를 저장한다
+    func removeMemo(
+        memo: Memo,
+        completionHandler: @escaping () -> Void
+    ) {
+        readMemo { memoList in
+            var memoList = memoList
+            if let idx = memoList.firstIndex(of: memo) {
+                memoList.remove(at: idx)
+                saveMemoList(memoList: memoList)
+                completionHandler()
+                return
+            }
+        }
+    }
+    
+    /// 메모 리스트를 저장하는 메서드
+    func saveMemoList(memoList: [Memo]) {
+            guard let data = try? JSONEncoder().encode(memoList),
+                  let memoListJsonObject = try? JSONSerialization.jsonObject(with: data) else { return }
+            standard.setValue(memoListJsonObject, forKey: key)
+    }
     /// 현재 저장되어있는 모든 메모를 삭제하는 메서드
     func removeAll() {
         standard.removeObject(forKey: key)
