@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Memo: Codable, Equatable {
+struct Memo: Codable, Equatable, Hashable {
     static func == (lhs: Memo, rhs: Memo) -> Bool {
         lhs.id == rhs.id
     }

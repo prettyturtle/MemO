@@ -279,7 +279,7 @@ private extension WriteViewController {
         
         let isSecret = secretToggleCell.isSecret
         let memoTitle = memoTitleInputCell.titleTextField.text!.isEmpty ? "제목 없음" : memoTitleInputCell.titleTextField.text!
-        let memoContent = memoContentInputCell.contentTextView.textColor == .placeholderText ? "내용 없음" : memoContentInputCell.contentTextView.text!
+        let memoContent = memoContentInputCell.contentTextView.textColor == .placeholderText || memoContentInputCell.contentTextView.text == "" ? "내용 없음" : memoContentInputCell.contentTextView.text!
         return (isSecret, memoTitle, memoContent)
     }
 }

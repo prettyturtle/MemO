@@ -10,6 +10,13 @@ import SnapKit
 
 class MainViewController: UIViewController {
     // MARK: - UI Components
+    private lazy var searchController: UISearchController = {
+        let searchController = UISearchController()
+        searchController.searchBar.delegate = self
+        searchController.searchBar.tintColor = .mainColor
+        searchController.searchBar.placeholder = "메모 검색"
+        return searchController
+    }()
     private lazy var refreshControl: UIRefreshControl = {
         let refresh = UIRefreshControl()
         refresh.addTarget(
@@ -55,7 +62,10 @@ class MainViewController: UIViewController {
     
     // MARK: - Properties
     private let userDefaultsManager = UserDefaultsManager()
-    private var memoList = [Memo]()
+    private var memoList = [Memo]() // 테이블 뷰에 보여질 메모 리스트
+    private var memoSearchList = [String]() // 메모 검색 결과 리스트
+    private var tempMemoList = [Memo]() // 원본 메모 리스트
+    private var currentSearchText = "" // 검색하고 있던 text
     
     // MARK: - Life Cycle
     override func viewDidLoad() {
@@ -157,24 +167,66 @@ extension MainViewController: UITableViewDataSource {
     }
 }
 
+// MARK: - UISearchBarDelegate
+extension MainViewController: UISearchBarDelegate {
+    // 서치 바에 입력될 때마다 currentSearchText 갱신, searchText로 메모 검색
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        currentSearchText = searchText
+        searchMemo(text: searchText)
+    }
+    // 검색 완료하면 키보드 내리기
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        searchBar.endEditing(true)
+    }
+    // Cancel 버튼을 클릭하면, 전체 보기
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchMemo(text: "")
+    }
+}
+
+
 // MARK: - WriteViewControllerDelegate
 extension MainViewController: WriteViewControllerDelegate {
-    // 작성 완료되면 새로고침
+    // 작성 완료되면 새로고침, 검색중인 경우에는 새로고침 후 검색 결과 반영
     func uploadSuccessThenRefresh() {
-        getMemoList()
+        if navigationItem.searchController == nil {
+            getMemoList()
+        } else {
+            getMemoList()
+            memoSearchList = tempMemoList.map { $0.title.realText }
+            searchMemo(text: currentSearchText)
+        }
     }
     func modifySuccessThenRefresh(newMemo: Memo) {}
 }
 
 // MARK: - DetailViewControllerDelegate
 extension MainViewController: DetailViewControllerDelegate {
+    // 상세 정보에서 메인 뷰로 넘어올 때 새로고침, 검색중인 경우에는 새로고침 후 검색 결과 반영
     func willDisappearRefreshTableView() {
-        getMemoList()
+        if navigationItem.searchController == nil {
+            getMemoList()
+        } else {
+            getMemoList()
+            memoSearchList = tempMemoList.map { $0.title.realText }
+            searchMemo(text: currentSearchText)
+        }
     }
 }
 
 // MARK: - @objc Methods
 private extension MainViewController {
+    // 검색 버튼이 탭 되면
+    @objc func didTapSearchButton(_ sender: UIBarButtonItem) {
+        if navigationItem.searchController == nil { // 서치 컨트롤러가 없는 경우
+            sender.tintColor = .systemCyan
+            navigationItem.searchController = searchController // 서치 컨트롤러를 네비게이션 아이템으로 넣는다
+            navigationItem.hidesSearchBarWhenScrolling = false // 서치 바가 보이도록
+        } else { // 서치 컨트롤러가 있는 경우
+            sender.tintColor = .mainColor
+            navigationItem.searchController = nil // 서치 컨트롤러를 제거
+        }
+    }
     // 스크롤해서 저장되어있는 메모들을 받아와 새로고침
     @objc func beginRefresh(_ sender: UIRefreshControl) {
         getMemoList()
@@ -192,6 +244,23 @@ private extension MainViewController {
 
 // MARK: - Logics
 private extension MainViewController {
+    // 메모 검색 메서드
+    func searchMemo(text: String) {
+        if text == "" { // 빈 문자열을 검색하면 모든 메모를 보여준다
+            memoList = tempMemoList
+        } else {
+            var searchResult = Set<Memo>()
+            for (idx, title) in memoSearchList.enumerated() {
+                if title.contains(text) {
+                    searchResult.insert(tempMemoList[idx])
+                }
+            }
+            memoList = Array(searchResult).sorted {
+                $0.createdDate.compare($1.createdDate) == .orderedDescending
+            }
+        }
+        memoListTableView.reloadData()
+    }
     func showRemoveFailAlert() { // 비밀 메모를 삭제할 때, 암호를 틀리면 얼럿을 띄어주는 메서드
         let alertController = UIAlertController(
             title: "비밀번호가 일치하지 않습니다",
@@ -278,6 +347,8 @@ private extension MainViewController {
             self?.memoListTableView.isHidden = $0.isEmpty
             self?.emptyImageView.isHidden = !$0.isEmpty
             self?.memoList = $0
+            self?.tempMemoList = $0
+            self?.memoSearchList = $0.map { $0.title.realText }
             self?.memoListTableView.reloadData()
         }
     }
@@ -287,6 +358,15 @@ private extension MainViewController {
 private extension MainViewController {
     func setupNavigationBar() {
         navigationItem.title = "메모 목록"
+        
+        let searchButton = UIBarButtonItem(
+            image: UIImage(systemName: "magnifyingglass"),
+            style: .plain,
+            target: self,
+            action: #selector(didTapSearchButton(_:))
+        )
+        searchButton.tintColor = .mainColor
+        navigationItem.rightBarButtonItem = searchButton
     }
     func attribute() {
         view.backgroundColor = .systemBackground
