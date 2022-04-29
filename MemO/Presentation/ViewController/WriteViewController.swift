@@ -129,10 +129,14 @@ private extension WriteViewController {
         
         if newMemoInfo.isSecret { // 만약 비밀 메모인 경우, 암호를 설정하도록
             showPasswordInputAlert { [weak self] pw in
-                if let pw = pw,
-                   !pw.isEmpty {
-                    newMemo.password = pw
-                    self?.uploadNewMemo(newMemo: newMemo)
+                if let pw = pw {
+                    if !pw.isEmpty { // 암호를 입력하면 비밀 메모로 작성
+                        newMemo.password = pw
+                        self?.uploadNewMemo(newMemo: newMemo)
+                    } else { // 암호를 입력하지 않으면 일반 메모로 작성된다
+                        newMemo.isSecret = false
+                        self?.uploadNewMemo(newMemo: newMemo)
+                    }
                 }
             }
         } else { // 일반 메모인 경우, 바로 저장
@@ -155,10 +159,14 @@ private extension WriteViewController {
         
         if newMemoInfo.isSecret { // 만약 비밀 메모로 수정된 경우, 암호를 설정하도록
             showPasswordInputAlert { [weak self] pw in
-                if let pw = pw,
-                   !pw.isEmpty {
-                    newMemo.password = pw
-                    self?.updateMemo(previousMemo: previousMemo, newMemo: newMemo)
+                if let pw = pw {
+                    if !pw.isEmpty { // 암호를 입력하면 비밀 메모로 수정
+                        newMemo.password = pw
+                        self?.updateMemo(previousMemo: previousMemo, newMemo: newMemo)
+                    } else { // 암호를 입력하지 않으면 일반 메모로 수정된다
+                        newMemo.isSecret = false
+                        self?.updateMemo(previousMemo: previousMemo, newMemo: newMemo)
+                    }
                 }
             }
         } else { // 일반 메모로 수정되면 바로 수정
@@ -239,7 +247,7 @@ private extension WriteViewController {
     func showPasswordInputAlert(completionHandler: @escaping (String?) -> Void) {
         let alertController = UIAlertController(
             title: "비밀 메모 작성",
-            message: nil,
+            message: "비밀번호를 설정하지 않으면 일반 메모로 작성됩니다",
             preferredStyle: .alert
         )
         alertController.addTextField {

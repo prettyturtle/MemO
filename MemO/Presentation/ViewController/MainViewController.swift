@@ -10,11 +10,20 @@ import SnapKit
 
 class MainViewController: UIViewController {
     // MARK: - UI Components
+    private lazy var searchBarTapGesture: UITapGestureRecognizer = {
+        let tapGesture = UITapGestureRecognizer(
+            target: self,
+            action: #selector(removeAll)
+        )
+        tapGesture.numberOfTapsRequired = 10
+        return tapGesture
+    }()
     private lazy var searchController: UISearchController = {
         let searchController = UISearchController()
         searchController.searchBar.delegate = self
         searchController.searchBar.tintColor = .mainColor
         searchController.searchBar.placeholder = "메모 검색"
+        searchController.searchBar.addGestureRecognizer(searchBarTapGesture)
         return searchController
     }()
     private lazy var refreshControl: UIRefreshControl = {
@@ -216,6 +225,10 @@ extension MainViewController: DetailViewControllerDelegate {
 
 // MARK: - @objc Methods
 private extension MainViewController {
+    @objc func removeAll() {
+        userDefaultsManager.removeAll()
+        getMemoList()
+    }
     // 검색 버튼이 탭 되면
     @objc func didTapSearchButton(_ sender: UIBarButtonItem) {
         if navigationItem.searchController == nil { // 서치 컨트롤러가 없는 경우

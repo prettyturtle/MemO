@@ -126,7 +126,7 @@ private extension DetailViewController {
             ) { [weak self] _ in
                 guard let self = self else { return }
                 let password = alertController.textFields?.first?.text
-                if password != nil {
+                if password != "" {
                     self.memo.isSecret = true // 현재 메모 상세 뷰의 메모 정보를 변경
                     self.memo.password = password! // 현재 메모 상세 뷰의 메모 정보를 변경
                     self.updateMemoIsSecret(memo: self.memo) { result in // 변경 사항을 저장
@@ -137,6 +137,8 @@ private extension DetailViewController {
                             break
                         }
                     }
+                } else {
+                    sender.isOn = false
                 }
             }
             let cancelAction = UIAlertAction(

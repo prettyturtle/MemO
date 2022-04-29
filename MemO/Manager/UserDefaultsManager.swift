@@ -72,7 +72,7 @@ struct UserDefaultsManager {
     }
     /// 현재 저장되어있는 모든 메모를 삭제하는 메서드
     func removeAll() {
-        standard.removeObject(forKey: key)
+        standard.setValue([], forKey: key)
     }
     
     /// 메모를 수정하는 메서드
