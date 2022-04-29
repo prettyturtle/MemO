@@ -20,8 +20,25 @@ struct Memo: Codable, Equatable, Hashable {
     
     var date: String {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "y.M.d(E) h:m:s"
+        dateFormatter.dateFormat = "y.M.d(E)"
         dateFormatter.locale = Locale(identifier: "ko_KR")
         return dateFormatter.string(from: createdDate)
+    }
+    func dateCalc() -> String {
+        let dateDiff = Calendar(identifier: .gregorian)
+            .dateComponents(
+                [.day, .hour, .minute, .second],
+                from: createdDate, to: Date.now
+            )
+        if dateDiff.day! >= 1 {
+            return date
+        } else if dateDiff.hour! >= 1 {
+            return "\(dateDiff.hour!)시간 전"
+        } else if dateDiff.minute! >= 1 {
+            return "\(dateDiff.minute!)분 전"
+        } else if dateDiff.second! >= 0 {
+            return "방금 전"
+        }
+        return date
     }
 }

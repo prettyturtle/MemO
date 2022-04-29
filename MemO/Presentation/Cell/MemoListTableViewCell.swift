@@ -42,11 +42,11 @@ class MemoListTableViewCell: UITableViewCell {
         if !memo.isSecret {
             contentLabel.text = memo.content
         } else {
-            contentLabel.text = "비밀메모 입니다." // 비밀 메모인 경우, 내용 가리기
+            contentLabel.text = "비밀 메모 입니다." // 비밀 메모인 경우, 내용 가리기
         }
         secretImageView.isHidden = !memo.isSecret
         titleLabel.text = memo.title
-        dateLabel.text = memo.date
+        dateLabel.text = memo.dateCalc()
     }
 }
 

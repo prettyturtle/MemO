@@ -49,7 +49,7 @@ class DetailViewController: UIViewController {
     }()
     private lazy var dateLabel: UILabel = {
         let label = UILabel()
-        label.text = memo.date
+        label.text = memo.dateCalc()
         label.textColor = .secondaryLabel
         label.font = .systemFont(ofSize: 14.0, weight: .regular)
         return label
