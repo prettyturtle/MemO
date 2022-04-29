@@ -211,6 +211,7 @@ private extension DetailViewController {
 private extension DetailViewController {
     // 메모 수정이 완료되면 화면을 새로고침하는 메서드
     func reloadView(memo: Memo) {
+        secretToggle.isOn = memo.isSecret
         titleLabel.text = memo.title
         contentLabel.text = memo.content
         dateLabel.text = memo.date
