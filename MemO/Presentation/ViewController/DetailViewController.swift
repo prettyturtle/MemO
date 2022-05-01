@@ -49,7 +49,7 @@ class DetailViewController: UIViewController {
     }()
     private lazy var dateLabel: UILabel = {
         let label = UILabel()
-        label.text = memo.dateCalc()
+        label.text = memo.date
         label.textColor = .secondaryLabel
         label.font = .systemFont(ofSize: 14.0, weight: .regular)
         return label
@@ -271,15 +271,16 @@ private extension DetailViewController {
             $0.top.equalTo(secretToggle.snp.bottom).offset(commonSpacing)
             $0.trailing.equalToSuperview().inset(commonSpacing)
         }
-        contentLabel.snp.makeConstraints {
+        dateLabel.snp.makeConstraints {
             $0.leading.equalTo(titleLabel.snp.leading)
             $0.top.equalTo(titleLabel.snp.bottom).offset(commonSpacing)
             $0.trailing.equalTo(titleLabel.snp.trailing)
         }
-        dateLabel.snp.makeConstraints {
+        contentLabel.snp.makeConstraints {
             $0.leading.equalTo(titleLabel.snp.leading)
-            $0.top.equalTo(contentLabel.snp.bottom).offset(commonSpacing)
-            $0.bottom.equalToSuperview()
+            $0.top.equalTo(dateLabel.snp.bottom).offset(commonSpacing)
+            $0.trailing.equalTo(titleLabel.snp.trailing)
+            $0.bottom.equalToSuperview().inset(commonSpacing)
         }
     }
 }

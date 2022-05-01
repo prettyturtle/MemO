@@ -20,7 +20,7 @@ struct Memo: Codable, Equatable, Hashable {
     
     var date: String {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "y.M.d(E)"
+        dateFormatter.dateFormat = "yy.MM.dd(E) HH:mm"
         dateFormatter.locale = Locale(identifier: "ko_KR")
         return dateFormatter.string(from: createdDate)
     }
